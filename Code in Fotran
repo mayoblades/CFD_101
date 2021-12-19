@@ -1,0 +1,62 @@
+
+PROGRAM Diffusion_problem
+!=========================================================================================================
+!TO ESTIMATE THE DISTRIBUTION OF TEMPERATURE ON A FLAT PLATE USING LAPLACE EQUATION
+!     0<=x<=1,  0<=y<=1
+!     with boundary conditions T=1@x=0,T=cos(1.5*pi*y)+1 @x=1, T=1@y=0,T=(1+x)@y=0
+!IMPLICIT NONE
+!=========================================================================================================
+!AUTHOR:ADEBAYO EBENEZER  DATE:8/03/2020
+!=========================================================================================================
+!DECLARE VARIABLES
+!=========================================================================================================
+INTEGER::i,j,it,Nx,Ny
+REAL::xmax,ymax
+REAL::xmin,ymin
+REAL::dx
+REAL::dy
+REAL, DIMENSION, ALLOCATABLE(:,:):: T
+REAL, DIMENSION, ALLOCATABLE(:):: x,y
+!=========================================================================================================
+!DEFINE PARAMETERS
+!=========================================================================================================
+Nx = 100                          ! Number of grid points
+Ny = 100                          ! Number of iterations
+xmax = 1.0                        ! Domain limit to the right
+xmin = 0.0                        ! Domain limit to the left
+dx = (xmax-xmin)/(Nx)             ! Mesh size
+T(0,:) = 1.0                      ! Initial solution x direction
+T(:,0) = 1.0                      ! Initial solution y direction
+ALLOCATE(T(Nx,Ny), x(Nx),y(Ny))
+it=500
+!=========================================================================================================
+!DISCRETIZATION 
+!=========================================================================================================
+
+Do i = 1,Nx
+    x = xmin+i*dx   
+    T(Nx-1,:) = 1+x  
+End Do
+    Do j = 1,Ny
+        y = ymin+j*dx  
+        T(:,Ny-1) = cos(1.5*pi*y)
+    End Do
+
+
+!=========================================================================================================
+! ITERATIVE SOLVER ON THE FORWARD CENTRAL SCHEMES
+!=========================================================================================================
+Do j = 1,it !fix number of iterations at 500
+    Do i = 1,Nx-1
+        Do j = 1,Ny-1
+            T(i,j) = 0.25*(T(i+1,j)+T(i-1,j)+T(i,j+1)+T(i,j-1))
+
+End Do
+    End Do
+        End Do
+!=========================================================================================================
+! WRITE comma separated DATA FILE FOR PARAVIEW/TECHPLOT
+      open(unit=10,file='results.dat')
+      write(10,*)'x coord, y coord, z coord, T(i,j)'
+
+END PROGRAM Diffusion_problem
