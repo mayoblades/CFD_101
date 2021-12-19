@@ -1,0 +1,74 @@
+
+    ################################################################
+    #
+    # CFD: 2D-Diffusion Temperature problem
+    # Objective: Solve equation using the Forward-Time Central-Space scheme
+    # Equation:The Laplace equation models for heat conduction 
+    # Author: E.Mayowa Adebayo
+    # Date: 19/12/2021
+    #
+    ################################################################
+
+    #===============================================================
+    # Libraries
+    #===============================================================
+
+    import matplotlib.pyplot as plt
+    import numpy as np
+    import math
+
+    from matplotlib import rc
+    rc('font', family='serif')
+    rc('lines', linewidth=1.5)
+    rc('font', size=16)
+    plt.rc('legend',**{'fontsize':14})
+
+    #===============================================================
+    # Parameters
+    #===============================================================
+    Nx = Ny=100;                      # Number of grid points
+    xmax=ymax = 1.0;                  # Domain limit to the right
+    xmin=ymin = 0.0;                  # Domain limit to the left
+    dx = dy= (xmax-xmin)/(Nx)         # Mesh size
+    T = np.zeros((Nx,Ny))             # T^n_i
+    T[0,:] = 1                        # Ttop Boundary Conditions
+    T[:,0] = 1                        # Tleft Boundary Conditions
+    maxIter =1000                     # Number of iterations
+
+
+    #===============================================================
+    # Discretisation
+    #===============================================================
+    x = np.linspace(xmin,xmax,Nx)     # Discretized Xmesh
+    y = np.linspace(ymin,ymax,Ny)     # Discretized Ymesh
+    T[Nx-1,:] = 1+x                   #Tbottom Boundary Conditions
+    T[:,Ny-1] = 1.5*math.pi*y)+1      #Tbottom Boundary Conditions
+
+
+    #===============================================================
+    # Iterations
+    #===============================================================
+    print("Iterating.....please wait")
+    for iteration in range(0, maxIter):
+        for i in range(1, Nx-1):
+            for j in range(1, Ny-1):
+                T[i, j] = 0.25 * (T[i+1][j] + T[i-1][j] + T[i][j+1] + T[i][j-1])
+
+    print("Iteration finished")
+
+
+    #===============================================================
+    # Configure the contour
+    #===============================================================
+
+    plt.title("Contour of Temperature")
+    plt.contourf(x, y, T, 50,cmap='jet')
+
+    # Set Colorbar
+    plt.colorbar()
+    plt.savefig("LaplaceTemp")
+
+    # Show the result in the plot window
+    plt.show()
+
+    print("")
